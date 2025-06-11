@@ -4,13 +4,13 @@
         <title>Login Page </title>
         
     <link rel="stylesheet" href="login.css">
-        
     </head>
     <body>
 
     <nav class="navbar">
 		<a  class="navbar-logo">Wiki<span>Dish</span>.</a>
-		
+
+	</nav>	
 
         <br><br>
         <h3 align="center"> Create New Account</h3>
@@ -35,7 +35,7 @@
           
                 <tr><td>DATE OF BIRTH :</td> </tr>
                     
-                    <tr><td><input type="text" name="DATE" id="DATE"></td></tr> <br>
+                    <tr><td><input type="date" name="DATE" id="DATE"></td></tr> <br>
                
                 
                 <tr>
