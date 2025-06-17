@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WANDER TASTE - Interactive Map</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background-color: #f4f7f6;
+      }
+
+      .navbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-image: linear-gradient(90deg, #a0d88c 0%, #6cbf58 100%);
+        padding: 10px 20px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      .logo h1 {
+        color: black;
+        font-weight: 700;
+        font-size: 1.75rem;
+      }
+
+      .nav-links {
+        list-style: none;
+        display: flex;
+        gap: 25px;
+      }
+
+      .nav-links li a {
+        color: black;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: color 0.3s ease;
+        cursor: pointer;
+      }
+
+      .nav-links li a:after {
+        content: "";
+        display: block;
+        width: 0;
+        height: 2px;
+        background-color: #000000;
+        transition: width 0.3s ease;
+      }
+
+      .nav-links li a:hover:after {
+        width: 100%;
+      }
+
+      .search-form {
+        display: flex;
+        align-items: center;
+      }
+
+      .search-input {
+        padding: 7px 12px;
+        font-size: 0.9rem;
+        border: none;
+        border-radius: 4px 0 0 4px;
+        outline: none;
+        width: 180px;
+        transition: width 0.3s ease;
+      }
+
+      .search-input:focus {
+        width: 220px;
+        box-shadow: 0 0 5px #209826;
+      }
+
+      .search-button {
+        background-color: #209826;
+        border: none;
+        padding: 8px 15px;
+        color: #000000;
+        font-weight: 600;
+        border-radius: 0 4px 4px 0;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      .search-button:hover,
+      .search-button:focus {
+        background-color: #1ec827;
+        outline: none;
+      }
+
+      /* Map Container Styles */
+      .map-container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 20px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      }
+
+      .map-title {
+        text-align: center;
+        margin-bottom: 30px;
+        color: #2d5a3d;
+        font-size: 2rem;
+        font-weight: 700;
+      }
+
+      .click-instruction {
+        text-align: center;
+        color: #7a8a7d;
+        font-style: italic;
+        margin-bottom: 20px;
+      }
+
+      .world-map-wrapper {
+        position: relative;
+        width: 100%;
+        max-width: 1000px;
+        margin: 0 auto;
+        text-align: center;
+      }
+
+      .world-map {
+        width: 100%;
+        height: auto;
+        max-width: 100%;
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        transition: transform 0.3s ease;
+      }
+
+      /* Info Panels - Hidden by default, shown when targeted */
+      .info-panel {
+        margin-top: 30px;
+        padding: 25px;
+        background: linear-gradient(135deg, #f8fffe 0%, #e8f5f0 100%);
+        border-radius: 15px;
+        border-left: 5px solid #209826;
+        min-height: 120px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.5s ease;
+      }
+
+      .info-panel.default {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .info-content {
+        text-align: center;
+      }
+
+      .info-content h3 {
+        color: #2d5a3d;
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+      }
+
+      .info-content p {
+        color: #5a6c5d;
+        font-size: 1rem;
+        line-height: 1.6;
+      }
+
+      /* Continent-specific info panels */
+      .continent-info {
+        display: none;
+        animation: fadeInUp 0.6s ease forwards;
+      }
+
+      .continent-info:target {
+        display: block;
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .continent-info:target ~ .info-panel.default {
+        display: none;
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Hover effects for map areas */
+      area {
+        transition: all 0.3s ease;
+      }
+
+      area:hover {
+        filter: brightness(1.2);
+      }
+
+      area:focus {
+        outline: 3px solid #209826;
+        outline-offset: 2px;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .navbar {
+          flex-wrap: wrap;
+          gap: 10px;
+        }
+        .nav-links {
+          width: 100%;
+          justify-content: center;
+          gap: 15px;
+        }
+        .search-form {
+          width: 100%;
+          justify-content: center;
+        }
+        .search-input {
+          width: 70%;
+        }
+        .map-container {
+          margin: 20px;
+          padding: 15px;
+        }
+        .map-title {
+          font-size: 1.5rem;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .map-title {
+          font-size: 1.3rem;
+        }
+        .info-content h3 {
+          font-size: 1.3rem;
+        }
+        .info-content p {
+          font-size: 0.9rem;
+        }
+      }
+
+      /* Back to main button styling */
+      .back-button {
+        display: inline-block;
+        margin-top: 15px;
+        padding: 10px 20px;
+        background-color: #209826;
+        color: white;
+        text-decoration: none;
+        border-radius: 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 10px rgba(32, 152, 38, 0.3);
+      }
+
+      .back-button:hover {
+        background-color: #1ec827;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(32, 152, 38, 0.4);
+      }
+
+      /* Visual feedback for clickable areas */
+      .world-map-wrapper::after {
+        content: "🗺️ Click on any continent to explore!";
+        position: absolute;
+        bottom: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(32, 152, 38, 0.9);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        white-space: nowrap;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .world-map-wrapper:hover::after {
+        opacity: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="logo">
+        <h1>Wander Taste</h1>
+      </div>
+      <ul class="nav-links">
+        <li><a href="#">Home</a></li>
+        <li><a href="#" style="color: #209826">Map</a></li>
+        <li><a href="#">Continent</a></li>
+      </ul>
+      <form action="/search" method="GET" class="search-form">
+        <input
+          type="text"
+          name="q"
+          placeholder="Search..."
+          class="search-input"
+          aria-label="Search"
+        />
+        <button type="submit" class="search-button">Search</button>
+      </form>
+    </nav>
+
+    <div class="map-container">
+      <h2 class="map-title">Explore World Cuisines by Continent</h2>
+      <p class="click-instruction">
+        Click on any continent to discover its culinary treasures
+      </p>
+
+      <div class="world-map-wrapper">
+        <img
+          src="img/map_dunia.png"
+          alt="World Map"
+          class="world-map"
+          usemap="#worldmap"
+        />
+
+        <map name="worldmap">
+          <!-- North America -->
+          <area
+            shape="poly"
+            coords="50,50,300,50,350,120,300,200,200,220,100,200,50,150"
+            href="#north-america"
+            alt="North America"
+            title="North America - Click to explore cuisine"
+          />
+
+          <!-- South America -->
+          <area
+            shape="poly"
+            coords="180,240,280,240,320,300,300,420,220,440,180,380,160,320"
+            href="#south-america"
+            alt="South America"
+            title="South America - Click to explore cuisine"
+          />
+
+          <!-- Europe -->
+          <area
+            shape="poly"
+            coords="400,80,550,80,580,120,550,180,480,190,400,160"
+            href="#europe"
+            alt="Europe"
+            title="Europe - Click to explore cuisine"
+          />
+
+          <!-- Africa -->
+          <area
+            shape="poly"
+            coords="420,200,580,200,610,260,590,380,540,440,470,430,440,380,420,320"
+            href="#africa"
+            alt="Africa"
+            title="Africa - Click to explore cuisine"
+          />
+
+          <!-- Asia -->
+          <area
+            shape="poly"
+            coords="600,60,920,60,980,100,960,220,860,240,700,230,620,200,600,140"
+            href="#asia"
+            alt="Asia"
+            title="Asia - Click to explore cuisine"
+          />
+
+          <!-- Australia/Oceania -->
+          <area
+            shape="poly"
+            coords="780,380,920,380,950,420,920,460,820,470,780,440"
+            href="#oceania"
+            alt="Australia & Oceania"
+            title="Australia & Oceania - Click to explore cuisine"
+          />
+        </map>
+      </div>
+
+      <!-- Default Info Panel -->
+      <div class="info-panel default" id="default-info">
+        <div class="info-content">
+          <h3>Welcome to Wander Taste World Map</h3>
+          <p>
+            Click on any continent above to explore its unique culinary
+            traditions, popular dishes, and food culture. Discover the flavors
+            that make each region special!
+          </p>
+        </div>
+      </div>
+
+      <!-- Continent-specific Info Panels -->
+      <div class="info-panel continent-info" id="north-america">
+        <div class="info-content">
+          <h3>🍔 North American Cuisine</h3>
+          <p>
+            From American BBQ and Mexican tacos to Canadian poutine, North
+            America offers a diverse fusion of flavors influenced by indigenous
+            traditions and immigrant cultures. Popular dishes include
+            hamburgers, hot dogs, maple syrup treats, and spicy Mexican salsas.
+          </p>
+          <a href="#" class="back-button">← Back to Map</a>
+        </div>
+      </div>
+
+      <div class="info-panel continent-info" id="south-america">
+        <div class="info-content">
+          <h3>🥩 South American Delights</h3>
+          <p>
+            Rich in tropical fruits, grilled meats, and vibrant spices. Famous
+            for Argentinian steaks, Brazilian feijoada, Peruvian ceviche, and
+            Colombian arepas. The continent's cuisine reflects indigenous
+            ingredients combined with European and African influences.
+          </p>
+          <a href="#" class="back-button">← Back to Map</a>
+        </div>
+      </div>
+
+      <div class="info-panel continent-info" id="europe">
+        <div class="info-content">
+          <h3>🍝 European Gastronomy</h3>
+          <p>
+            Home to refined culinary traditions including French pastries,
+            Italian pasta and pizza, Spanish paella, and German sausages. Each
+            country offers unique specialties from Mediterranean olive oils to
+            Nordic seafood preparations.
+          </p>
+          <a href="#" class="back-button">← Back to Map</a>
+        </div>
+      </div>
+
+      <div class="info-panel continent-info" id="africa">
+        <div class="info-content">
+          <h3>🍲 African Flavors</h3>
+          <p>
+            Diverse and flavorful cuisine featuring aromatic spices, grains, and
+            stews. Known for Moroccan tagines, Ethiopian injera, South African
+            braai, and West African jollof rice. Rich use of indigenous
+            ingredients and traditional cooking methods.
+          </p>
+          <a href="#" class="back-button">← Back to Map</a>
+        </div>
+      </div>
+
+      <div class="info-panel continent-info" id="asia">
+        <div class="info-content">
+          <h3>🍜 Asian Cuisine</h3>
+          <p>
+            The world's most diverse culinary region featuring Chinese
+            stir-fries, Japanese sushi, Indian curries, Thai pad thai, and
+            Korean kimchi. Known for rice-based dishes, exotic spices, and
+            harmony of flavors from sweet to umami.
+          </p>
+          <a href="#" class="back-button">← Back to Map</a>
+        </div>
+      </div>
+
+      <div class="info-panel continent-info" id="oceania">
+        <div class="info-content">
+          <h3>🦘 Pacific Flavors</h3>
+          <p>
+            Fresh seafood, indigenous bush foods, and fusion cuisine. Australian
+            meat pies, New Zealand lamb, and Pacific Island tropical fruits.
+            Modern Australian cuisine blends Asian and European influences with
+            native ingredients.
+          </p>
+          <a href="#" class="back-button">← Back to Map</a>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
