@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WANDER TASTE</title>
+    <link rel="stylesheet" href="main2.css" />
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="logo">
+        <h1>Wander Taste</h1>
+      </div>
+      <ul class="nav-links">
+        <li><a href="#">Home</a></li>
+        <li><a href="#">Map</a></li>
+        <li><a href="#">Continent</a></li>
+      </ul>
+      <form action="/search" method="GET" class="search-form">
+        <input
+          type="text"
+          name="q"
+          placeholder="Search..."
+          class="search-input"
+          aria-label="Search"
+        />
+        <button type="submit" class="search-button">Search</button>
+      </form>
+    </nav>
+    <div class="map-container">
+      Let's explore your taste
+      <img
+        class="world-map"
+        alt="world_map"
+        src="img/vecteezy_map-world-png-graphic-clipart-design_20003850.png"
+        onclick="alert('Anda menekan area: Amerika Utara'); return false;"
+      />
+
+      <map name="worldmap">
+        <area
+          shape="poly"
+          coords="50,50,280,90,310,180,300,300,230,370,160,360,90,220"
+          href="amerikautara.html"
+          alt="Amerika Utara"
+        />
+        <area
+          shape="poly"
+          coords="290,380,380,460,450,410,440,320,390,290,330,350"
+          href="amerikaselatan.html"
+          alt="Amerika Selatan"
+        />
+        <area
+          shape="poly"
+          coords="560,90,600,110,620,140,650,170,690,160,670,135,620,110"
+          href="eropa.html"
+          alt="Eropa"
+        />
+        <area
+          shape="poly"
+          coords="610,210,680,280,670,350,620,390,580,340,580,270,610,230"
+          href="afrika.html"
+          alt="Afrika"
+        />
+        <area
+          shape="poly"
+          coords="700,140,780,180,820,240,820,290,770,320,720,280,700,220"
+          href="asia.html"
+          alt="Asia"
+        />
+        <area
+          shape="poly"
+          coords="850,370,900,390,910,440,860,460,825,440,840,400"
+          href="australia.html"
+          alt="Australia"
+        />
+      </map>
+    </div>
+  </body>
+</html>
